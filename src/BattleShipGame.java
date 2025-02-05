@@ -1,139 +1,109 @@
 import java.util.Random;
 import java.util.Scanner;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class BattleShipGame {
-    public static void matrisOlustur(char[][] matris)
-    {
-        for (int i = 0; i < matris.length; i++)
-        {
-            for (int j = 0; j < matris[i].length; j++)
-            {
+
+    public static void matrisOlustur(char[][] matris) {
+        for (int i = 0; i < matris.length; i++) {
+            for (int j = 0; j < matris[i].length; j++) {
                 matris[i][j] = '*';
             }
         }
     }
 
-    public static void rastgeleGemileriYerlestir(char[][] matris,int gemi)
-    {
+    public static boolean gemiYerleştirilebilirMi(char[][] matris, int x, int y, int gemi, int yon) {
+        for (int h = 0; h < gemi; h++) {
+            int yeniX = (yon == 0) ? x + h : x;
+            int yeniY = (yon == 1) ? y + h : y;
+            if (yeniX >= matris.length || yeniY >= matris[0].length || matris[yeniX][yeniY] != '*') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void rastgeleGemileriYerlestir(char[][] matris, int gemi) {
         Random rand = new Random();
         int boyut = matris.length;
+        int yon = rand.nextInt(2);  // 0: yatay, 1: dikey
 
+        int x, y;
+        boolean yerlesimBasarili = false;
 
-        int yon = rand.nextInt(2);
+        while (!yerlesimBasarili) {
+            x = rand.nextInt(boyut);
+            y = rand.nextInt(boyut);
 
-        if (yon==0)
-        {
-            int x = rand.nextInt(boyut);
-            int y = rand.nextInt(boyut);
-
-            for(int h=0; h<gemi; h++)
-            {
-                if(x+h>boyut)
-                {
-                    rastgeleGemileriYerlestir(matris,gemi);
-                    return;
+            // Gemiyi yerleştirmeye çalış
+            if (gemiYerleştirilebilirMi(matris, x, y, gemi, yon)) {
+                yerlesimBasarili = true;
+                for (int h = 0; h < gemi; h++) {
+                    int yeniX = (yon == 0) ? x + h : x;
+                    int yeniY = (yon == 1) ? y + h : y;
+                    matris[yeniX][yeniY] = Character.forDigit(gemi, 10);
                 }
             }
-            for(int h=0; h<gemi; h++)
-                matris[x+h][y]=Character.forDigit(gemi, 10);
-        }
-        else
-        {
-            int x = rand.nextInt(boyut);
-            int y = rand.nextInt(boyut);
-
-            for(int h=0; h<gemi; h++)
-            {
-                if(y+h>boyut)
-                {
-                    rastgeleGemileriYerlestir(matris,gemi);
-                    return;
-                }
-            }
-            for (int h=0; h<gemi; h++)
-                matris[x][y+h]= Character.forDigit(gemi, 10);
         }
     }
 
-
-    public static void oyunuOyna(char[][] oyuncuMatrisi, char[][] bilgisayarMatrisi, Scanner scanner, int amiralGemisiSayaci,int amiral2) {
-        while (true)
-        {
+    public static void oyunuOyna(char[][] oyuncuMatrisi, char[][] bilgisayarMatrisi, Scanner scanner, int amiralGemisiSayaci, int amiral2) {
+        while (true) {
             // Oyuncu veya bilgisayar atış yapacak
             int atis = (int) (Math.random() * 2); // 0: Bilgisayar, 1: Oyuncu
 
-            if (atis == 0)
-            {
+            if (atis == 0) {
                 // Bilgisayarın atış yapması
                 int sutun = (int) (Math.random() * oyuncuMatrisi.length);
                 int satir = (int) (Math.random() * oyuncuMatrisi[0].length);
 
-                if(Character.isDigit(oyuncuMatrisi[satir][sutun]))
-                {
-                    if(oyuncuMatrisi[satir][sutun]=='5')
-                    {
+                if (Character.isDigit(oyuncuMatrisi[satir][sutun])) {
+                    if (oyuncuMatrisi[satir][sutun] == '5') {
                         System.out.println("Bilgisayar amiral gemisini vurdu!");
                         oyuncuMatrisi[satir][sutun] = 'X';
                         amiralGemisiSayaci--;
-                    }
-
-                    else{
+                    } else {
                         System.out.println("Bilgisayar normal bir gemiyi vurdu!");
                         oyuncuMatrisi[satir][sutun] = 'O';
                     }
                 }
-                if(oyuncuMatrisi[satir][sutun]=='*')
-                {
+                if (oyuncuMatrisi[satir][sutun] == '*') {
                     System.out.println("Bilgisayar boş yeri vurdu!");
                     oyuncuMatrisi[satir][sutun] = '-';
                 }
-            }
-
-            else
-            {
+            } else {
                 // Oyuncunun atış yapması
                 System.out.print("Atış yapmak istediğiniz koordinatı girin (örnek: A3): ");
                 String giris = scanner.next();
                 char harf = Character.toUpperCase(giris.charAt(0));
-                int satir = giris.charAt(1)-'1';
-                if(giris.length()==3){
-                    satir=giris.charAt(2)-'1'+10;
+                int satir = giris.charAt(1) - '1';
+                if (giris.length() == 3) {
+                    satir = giris.charAt(2) - '1' + 10;
                 }
 
                 int sutun = harf - 'A';
 
-                if(Character.isDigit(bilgisayarMatrisi[satir][sutun]))
-                {
-                    if(bilgisayarMatrisi[satir][sutun]=='5')
-                    {
+                if (Character.isDigit(bilgisayarMatrisi[satir][sutun])) {
+                    if (bilgisayarMatrisi[satir][sutun] == '5') {
                         System.out.println("Amiral gemisini vurdunuz!");
                         bilgisayarMatrisi[satir][sutun] = 'X';
                         amiral2--;
-                    }
-
-                    else
-                    {
+                    } else {
                         System.out.println("Normal bir gemiyi vurdunuz!");
                         bilgisayarMatrisi[satir][sutun] = 'O';
                     }
                 }
-                if(bilgisayarMatrisi[satir][sutun]=='*')
-                {
+                if (bilgisayarMatrisi[satir][sutun] == '*') {
                     System.out.println("Boş yeri vurdunuz!");
                     bilgisayarMatrisi[satir][sutun] = '-';
                 }
             }
 
             // Oyun durumu kontrolü
-            if (amiralGemisiSayaci == 0)
-            {
-                System.out.println("malesef kaybettiniz");
+            if (amiralGemisiSayaci == 0) {
+                System.out.println("Malesef kaybettiniz");
                 break;
             }
-            if (amiral2 == 0)
-            {
+            if (amiral2 == 0) {
                 System.out.println("Tebrikler! Amiral gemiyi batırdınız. Oyunu kazandınız!");
                 break;
             }
@@ -148,21 +118,16 @@ public class BattleShipGame {
         }
     }
 
-
-    public static void matrisYazdir(char[][] matris)
-    {
+    public static void matrisYazdir(char[][] matris) {
         System.out.print("  ");
-        for (int i = 0; i < matris.length; i++)
-        {
+        for (int i = 0; i < matris.length; i++) {
             System.out.print((char) ('A' + i) + " ");
         }
         System.out.println();
 
-        for (int i = 0; i < matris.length; i++)
-        {
-            System.out.print((i+1) + " ");
-            for (int j = 0; j < matris[i].length; j++)
-            {
+        for (int i = 0; i < matris.length; i++) {
+            System.out.print((i + 1) + " ");
+            for (int j = 0; j < matris[i].length; j++) {
                 System.out.print(matris[i][j] + " ");
             }
             System.out.println();
@@ -171,7 +136,7 @@ public class BattleShipGame {
 
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        int[] gemiler={2,2,2,3,3,5};
+        int[] gemiler = {2, 2, 2, 3, 3, 5};
 
         System.out.println("Amiral Battı Oyununa Hoşgeldiniz!");
         System.out.println("Lütfen oynamak istediğiniz seviyeyi seçin:");
@@ -186,17 +151,16 @@ public class BattleShipGame {
 
         matrisOlustur(oyuncuMatrisi);
         matrisOlustur(bilgisayarMatrisi);
-        for(int gemi:gemiler)
-        {
-            rastgeleGemileriYerlestir(oyuncuMatrisi,gemi);
-            rastgeleGemileriYerlestir(bilgisayarMatrisi,gemi);
+
+        for (int gemi : gemiler) {
+            rastgeleGemileriYerlestir(oyuncuMatrisi, gemi);
+            rastgeleGemileriYerlestir(bilgisayarMatrisi, gemi);
         }
+
         System.out.println("Oyun başlıyor...");
-        int amiralGemisiSayaci = 5 ;
-        int amiral2=5;
+        int amiralGemisiSayaci = 5;
+        int amiral2 = 5;
 
-        oyunuOyna(oyuncuMatrisi, bilgisayarMatrisi, scan, amiralGemisiSayaci,amiral2);
-
+        oyunuOyna(oyuncuMatrisi, bilgisayarMatrisi, scan, amiralGemisiSayaci, amiral2);
     }
-
 }
