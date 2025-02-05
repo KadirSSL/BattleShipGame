@@ -1,7 +1,7 @@
 import java.util.Random;
 import java.util.Scanner;
 
-public class BattleShipGame {//finished
+public class BattleShipGame {//finish
 
     public static void matrisOlustur(char[][] matris) {
         for (int i = 0; i < matris.length; i++) {
